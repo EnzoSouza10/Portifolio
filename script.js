@@ -64,16 +64,55 @@ document.querySelectorAll('.skill-fill').forEach(bar => {
   observed.observe(bar);
 });
 
-// Form submit
-function handleSubmit(btn) {
-  btn.textContent = 'Mensagem enviada ✓';
-  btn.style.background = '#22c55e';
-  btn.style.borderColor = '#22c55e';
-  setTimeout(() => {
-    btn.textContent = 'Enviar mensagem →';
-    btn.style.background = 'var(--blue)';
-    btn.style.borderColor = 'var(--blue)';
-  }, 3000);
+// Form submit via Formspree
+const contactForm = document.getElementById('contact-form');
+const submitBtn = document.getElementById('submit-btn');
+
+if (contactForm) {
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    submitBtn.textContent = 'Enviando...';
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.7';
+
+    const data = new FormData(contactForm);
+
+    try {
+      const res = await fetch(contactForm.action, {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (res.ok) {
+        submitBtn.textContent = 'Mensagem enviada ✓';
+        submitBtn.style.background = '#22c55e';
+        submitBtn.style.borderColor = '#22c55e';
+        submitBtn.style.opacity = '1';
+        contactForm.reset();
+        setTimeout(() => {
+          submitBtn.textContent = 'Enviar mensagem →';
+          submitBtn.style.background = 'var(--blue)';
+          submitBtn.style.borderColor = 'var(--blue)';
+          submitBtn.disabled = false;
+        }, 4000);
+      } else {
+        throw new Error('Erro no envio');
+      }
+    } catch (err) {
+      submitBtn.textContent = 'Erro ao enviar. Tente novamente.';
+      submitBtn.style.background = '#ef4444';
+      submitBtn.style.borderColor = '#ef4444';
+      submitBtn.style.opacity = '1';
+      submitBtn.disabled = false;
+      setTimeout(() => {
+        submitBtn.textContent = 'Enviar mensagem →';
+        submitBtn.style.background = 'var(--blue)';
+        submitBtn.style.borderColor = 'var(--blue)';
+      }, 4000);
+    }
+  });
 }
 
 // Menu hambúrguer
